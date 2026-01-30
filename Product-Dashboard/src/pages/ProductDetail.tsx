@@ -30,8 +30,10 @@ export default function ProductDetail() {
   const fetchProduct = async () => {
     try {
       setLoading(true);
-      const response = await api.get(`/products/${id}`);
-      setProduct(response.data);
+      const response = await api.get(`/products/get-product/${id}`);
+      const payload = response.data;
+      const resolved = Array.isArray(payload) ? payload[0] : payload;
+      setProduct(resolved ?? null);
     } catch (error) {
       console.error("Error fetching product:", error);
     } finally {
@@ -63,6 +65,16 @@ export default function ProductDetail() {
       </Container>
     );
   }
+
+  const priceValue = Number(product.price);
+  const formattedPrice = Number.isFinite(priceValue)
+    ? priceValue.toFixed(2)
+    : "0.00";
+
+  const ratingValue = Number(product.rating?.rate ?? 0);
+  const formattedRating = Number.isFinite(ratingValue)
+    ? ratingValue.toFixed(1)
+    : "0.0";
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -116,7 +128,7 @@ export default function ProductDetail() {
                   {/* Rating */}
                   <Box className="flex items-center gap-3">
                     <Rating
-                      value={product.rating.rate}
+                      value={Number.isFinite(ratingValue) ? ratingValue : 0}
                       precision={0.1}
                       readOnly
                       size="large"
@@ -125,7 +137,7 @@ export default function ProductDetail() {
                       variant="body1"
                       className="text-gray-600 font-medium"
                     >
-                      {product.rating.rate.toFixed(1)} ({product.rating.count}{" "}
+                      {formattedRating} ({product.rating.count}{" "}
                       reviews)
                     </Typography>
                   </Box>
@@ -138,7 +150,7 @@ export default function ProductDetail() {
                       variant="h3"
                       className="font-bold text-blue-600"
                     >
-                      ${product.price.toFixed(2)}
+                      ${formattedPrice}
                     </Typography>
                   </Box>
 
@@ -201,7 +213,7 @@ export default function ProductDetail() {
                           variant="body1"
                           className="font-medium text-gray-900"
                         >
-                          {product.rating.rate.toFixed(1)} / 5.0
+                          {formattedRating} / 5.0
                         </Typography>
                       </Box>
                       <Box className="flex justify-between py-2">

@@ -24,5 +24,7 @@ describe("ProductCard", () => {
     expect(screen.getByText("Test Product")).toBeInTheDocument();
     expect(screen.getByText("$99.99")).toBeInTheDocument();
     expect(screen.getByText("electronics")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /edit/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /delete/i })).toBeInTheDocument();
   });
 });

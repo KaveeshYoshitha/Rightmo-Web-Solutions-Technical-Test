@@ -6,6 +6,11 @@ import {
   createProduct,
 } from "../models/productsModel.js";
 
+const toNumber = (value, fallback = 0) => {
+  const n = Number(value);
+  return Number.isFinite(n) ? n : fallback;
+};
+
 // Get all products
 export const getProducts = async (req, res) => {
   try {
@@ -15,13 +20,13 @@ export const getProducts = async (req, res) => {
       const product = {
         id: row.id,
         title: row.title,
-        price: row.price,
+        price: toNumber(row.price),
         description: row.description,
         category: row.category,
-        image: row.image,
+        image: row.product_image ?? row.image,
         rating: {
-          rate: row.rate,
-          count: row.rate_count,
+          rate: toNumber(row.rate),
+          count: toNumber(row.rate_count),
         },
       };
       products.push(product);
@@ -44,13 +49,13 @@ export const getProductsById = async (req, res) => {
     const product = {
       id: rows.id,
       title: rows.title,
-      price: rows.price,
+      price: toNumber(rows.price),
       description: rows.description,
       category: rows.category,
-      image: rows.image,
+      image: rows.product_image ?? rows.image,
       rating: {
-        rate: rows.rate,
-        count: rows.rate_count,
+        rate: toNumber(rows.rate),
+        count: toNumber(rows.rate_count),
       },
     };
     products.push(product);

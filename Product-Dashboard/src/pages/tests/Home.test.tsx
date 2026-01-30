@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { BrowserRouter } from "react-router-dom";
 import Home from "../Home";
 import { api } from "../../services/api";
@@ -8,6 +8,7 @@ const mockSetPage = jest.fn();
 const mockSearch = jest.fn();
 const mockFilterByCategory = jest.fn();
 const mockSortByPrice = jest.fn();
+const mockLogout = jest.fn();
 
 jest.mock("../../services/api", () => ({
   api: {
@@ -47,6 +48,13 @@ jest.mock("../../store/ProductStore", () => ({
   },
 }));
 
+jest.mock("../../store/AuthStore", () => ({
+  useAuthStore: () => ({
+    user: { id: 1, username: "tester", email: "t@t.com" },
+    logout: mockLogout,
+  }),
+}));
+
 describe("Home Page", () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -78,5 +86,24 @@ describe("Home Page", () => {
     await waitFor(() => expect(mockSetProducts).toHaveBeenCalled());
 
     expect(screen.getByText(/Product Dashboard/i)).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /add product/i }),
+    ).toBeInTheDocument();
+  });
+
+  test("opens add product dialog", async () => {
+    render(
+      <BrowserRouter>
+        <Home />
+      </BrowserRouter>,
+    );
+
+    await waitFor(() => expect(mockSetProducts).toHaveBeenCalled());
+
+    fireEvent.click(screen.getByRole("button", { name: /add product/i }));
+    expect(
+      screen.getByRole("heading", { name: /add product/i }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /create/i })).toBeInTheDocument();
   });
 });
