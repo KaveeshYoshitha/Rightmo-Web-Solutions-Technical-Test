@@ -13,6 +13,7 @@ export function Filters() {
         <Select
           labelId="category-label"
           label="Category"
+          defaultValue="all"
           onChange={(e) => filterByCategory(e.target.value as string)}
         >
           <MenuItem value="all">All Categories</MenuItem>

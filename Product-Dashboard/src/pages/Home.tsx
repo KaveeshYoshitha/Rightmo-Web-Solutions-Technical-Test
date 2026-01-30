@@ -13,12 +13,20 @@ export default function ProductDashboard() {
     useProductStore();
 
   useEffect(() => {
-    setLoading(true);
-    api.get("/products").then((res) => {
-      setProducts(res.data);
-      setLoading(false);
-    });
+    fetchProducts();
   }, []);
+
+  const fetchProducts = async () => {
+    try {
+      setLoading(true);
+      const response = await api.get("/products");
+      setProducts(response.data);
+    } catch (error) {
+      console.error("Error fetching products:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const startIndex = (currentPage - 1) * itemsPerPage;
   const paginatedProducts = filteredProducts.slice(
@@ -42,14 +50,13 @@ export default function ProductDashboard() {
         </div>
       </header>
 
-      {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Search Bar */}
         <div className="mb-6">
           <SearchBar />
         </div>
 
-        {/* Filters Bar - Horizontal Layout */}
+        {/* Filters Bar */}
         <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
           <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-end">
             <div className="w-full lg:w-auto lg:flex-1">
@@ -67,14 +74,13 @@ export default function ProductDashboard() {
           </p>
         </div>
 
-        {/* Loading State */}
+        {/* Spinner */}
         {loading ? (
           <div className="flex items-center justify-center py-20">
             <CircularProgress size={40} />
           </div>
         ) : (
           <>
-            {/* No Results */}
             {filteredProducts.length === 0 ? (
               <div className="text-center py-20">
                 <p className="text-gray-500">
@@ -83,14 +89,12 @@ export default function ProductDashboard() {
               </div>
             ) : (
               <>
-                {/* Products Grid */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
                   {paginatedProducts.map((p) => (
                     <ProductCard key={p.id} product={p} />
                   ))}
                 </div>
 
-                {/* Pagination */}
                 {totalPages > 1 && (
                   <Pagination
                     count={totalPages}

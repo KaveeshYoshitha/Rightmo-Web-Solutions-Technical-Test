@@ -12,7 +12,6 @@ import {
   CircularProgress,
   Divider,
   Stack,
-  Paper,
 } from "@mui/material";
 import { ArrowBack as ArrowBackIcon } from "@mui/icons-material";
 import type { Product } from "../types/Product";
@@ -67,7 +66,6 @@ export default function ProductDetail() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
       <header className="bg-white shadow-sm">
         <Container maxWidth="lg" className="py-4">
           <Button startIcon={<ArrowBackIcon />} onClick={() => navigate("/")}>
@@ -76,11 +74,10 @@ export default function ProductDetail() {
         </Container>
       </header>
 
-      {/* Product Detail */}
       <Container maxWidth="lg" className="py-8">
         <Card className="overflow-hidden">
           <Grid container spacing={2}>
-            {/* Product Image - Left Side */}
+            {/* Product Image  */}
             <Grid size={{ xs: 6, md: 4 }}>
               <Box
                 className="bg-gray-100 p-8 flex items-center justify-center max-h-3/6"
@@ -94,7 +91,7 @@ export default function ProductDetail() {
               </Box>
             </Grid>
 
-            {/* Product Information - Right Side */}
+            {/* Product Information */}
             <Grid size={{ xs: 6, md: 8 }}>
               <Box className="p-8">
                 <Stack spacing={3}>
@@ -166,7 +163,6 @@ export default function ProductDetail() {
 
                   <Divider />
 
-                  {/* Product Specifications */}
                   <Box>
                     <Typography
                       variant="h6"

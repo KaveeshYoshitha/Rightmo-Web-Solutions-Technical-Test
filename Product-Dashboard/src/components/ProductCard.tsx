@@ -32,7 +32,6 @@ export function ProductCard({ product }: ProductCardProps) {
             />
           </CardMedia>
 
-          {/* Product Info */}
           <CardContent>
             {/* Category Badge */}
             <Box className="mb-2">
