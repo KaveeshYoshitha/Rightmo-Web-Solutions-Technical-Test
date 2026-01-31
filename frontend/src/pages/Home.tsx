@@ -209,9 +209,7 @@ export default function ProductDashboard() {
               <h1 className="text-3xl font-bold text-gray-900">
                 Product Dashboard
               </h1>
-              <p className="mt-1 text-sm text-gray-500">
-                Browse and filter products from our collection
-              </p>
+
               {user && (
                 <p className="mt-1 text-sm text-gray-500">
                   Signed in as{' '}
