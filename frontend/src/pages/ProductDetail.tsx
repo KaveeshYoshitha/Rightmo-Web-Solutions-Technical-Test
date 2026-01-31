@@ -137,8 +137,7 @@ export default function ProductDetail() {
                       variant="body1"
                       className="text-gray-600 font-medium"
                     >
-                      {formattedRating} ({product.rating.count}{" "}
-                      reviews)
+                      {formattedRating} ({product.rating.count} reviews)
                     </Typography>
                   </Box>
 
@@ -183,7 +182,7 @@ export default function ProductDetail() {
                       Specifications
                     </Typography>
                     <Stack spacing={2}>
-                      <Box className="flex justify-between py-2">
+                      {/* <Box className="flex justify-between py-2">
                         <Typography variant="body1" className="text-gray-600">
                           Product ID:
                         </Typography>
@@ -193,7 +192,7 @@ export default function ProductDetail() {
                         >
                           #{product.id}
                         </Typography>
-                      </Box>
+                      </Box> */}
                       <Box className="flex justify-between py-2">
                         <Typography variant="body1" className="text-gray-600">
                           Category:
