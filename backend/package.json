@@ -6,7 +6,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node src/server.js",
-    "dev": "nodemon src/server.js"
+    "dev": "nodemon src/server.js",
+    "lint": "eslint \"src/**/*.js\"",
+    "format": "prettier --write ."
   },
   "keywords": [],
   "author": "",
@@ -22,5 +24,11 @@
     "mysql2": "^3.16.2",
     "nodemon": "^3.1.11",
     "salt": "^0.5.5"
+  },
+  "devDependencies": {
+    "eslint": "^9.39.2",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-import": "^2.32.0",
+    "prettier": "^3.8.1"
   }
 }
