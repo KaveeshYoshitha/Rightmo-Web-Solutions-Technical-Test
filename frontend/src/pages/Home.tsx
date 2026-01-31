@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from 'react';
 import {
   Alert,
   Button,
@@ -10,14 +10,19 @@ import {
   Pagination,
   Stack,
   TextField,
-} from "@mui/material";
-import { SearchBar } from "../components/SearchBar";
-import { ProductCard } from "../components/ProductCard";
-import { useProductStore } from "../store/ProductStore";
-import { Filters } from "../components/Filters";
-import { api } from "../services/api";
-import { useAuthStore } from "../store/AuthStore";
-import type { Product } from "../types/Product";
+} from '@mui/material';
+import { SearchBar } from '../components/SearchBar';
+import { ProductCard } from '../components/ProductCard';
+import { useProductStore } from '../store/ProductStore';
+import { Filters } from '../components/Filters';
+import { api } from '../services/api';
+import { useAuthStore } from '../store/AuthStore';
+import type { Product } from '../types/Product';
+import axios from 'axios';
+
+type ApiErrorResponse = {
+  message?: string;
+};
 
 type ProductFormState = {
   title: string;
@@ -30,19 +35,19 @@ type ProductFormState = {
 };
 
 const emptyForm: ProductFormState = {
-  title: "",
-  price: "",
-  description: "",
-  category: "",
-  image: "",
-  rate: "",
-  rate_count: "",
+  title: '',
+  price: '',
+  description: '',
+  category: '',
+  image: '',
+  rate: '',
+  rate_count: '',
 };
 
 export default function ProductDashboard() {
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [dialogMode, setDialogMode] = useState<"create" | "edit">("create");
+  const [dialogMode, setDialogMode] = useState<'create' | 'edit'>('create');
   const [activeProductId, setActiveProductId] = useState<number | null>(null);
   const [form, setForm] = useState<ProductFormState>(emptyForm);
   const [formError, setFormError] = useState<string | null>(null);
@@ -53,25 +58,25 @@ export default function ProductDashboard() {
   const { filteredProducts, setProducts, currentPage, itemsPerPage, setPage } =
     useProductStore();
 
-  useEffect(() => {
-    fetchProducts();
-  }, []);
-
-  const fetchProducts = async () => {
+  const fetchProducts = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await api.get("/products/get-products");
+      const response = await api.get('/products/get-products');
       setProducts(response.data);
     } catch (error) {
-      console.error("Error fetching products:", error);
+      console.error('Error fetching products:', error);
     } finally {
       setLoading(false);
     }
-  };
+  }, [setProducts]);
+
+  useEffect(() => {
+    fetchProducts();
+  }, [fetchProducts]);
 
   const openCreateDialog = () => {
     setFormError(null);
-    setDialogMode("create");
+    setDialogMode('create');
     setActiveProductId(null);
     setForm(emptyForm);
     setDialogOpen(true);
@@ -79,16 +84,16 @@ export default function ProductDashboard() {
 
   const openEditDialog = (product: Product) => {
     setFormError(null);
-    setDialogMode("edit");
+    setDialogMode('edit');
     setActiveProductId(product.id);
     setForm({
-      title: product.title ?? "",
-      price: String(product.price ?? ""),
-      description: product.description ?? "",
-      category: product.category ?? "",
-      image: product.image ?? "",
-      rate: String(product.rating?.rate ?? ""),
-      rate_count: String(product.rating?.count ?? ""),
+      title: product.title ?? '',
+      price: String(product.price ?? ''),
+      description: product.description ?? '',
+      category: product.category ?? '',
+      image: product.image ?? '',
+      rate: String(product.rating?.rate ?? ''),
+      rate_count: String(product.rating?.count ?? ''),
     });
     setDialogOpen(true);
   };
@@ -102,7 +107,7 @@ export default function ProductDashboard() {
     setFormError(null);
 
     if (!user?.id) {
-      setFormError("You must be logged in to manage products.");
+      setFormError('You must be logged in to manage products.');
       return;
     }
 
@@ -116,22 +121,22 @@ export default function ProductDashboard() {
     const rate_count = Number(form.rate_count);
 
     if (!title || !description || !category || !image) {
-      setFormError("Please fill all fields.");
+      setFormError('Please fill all fields.');
       return;
     }
 
     if (!Number.isFinite(price) || price <= 0) {
-      setFormError("Price must be a positive number.");
+      setFormError('Price must be a positive number.');
       return;
     }
 
     if (!Number.isFinite(rate) || rate < 0 || rate > 5) {
-      setFormError("Rating must be between 0 and 5.");
+      setFormError('Rating must be between 0 and 5.');
       return;
     }
 
     if (!Number.isFinite(rate_count) || rate_count < 0) {
-      setFormError("Rating count must be 0 or greater.");
+      setFormError('Rating count must be 0 or greater.');
       return;
     }
 
@@ -147,11 +152,11 @@ export default function ProductDashboard() {
 
     try {
       setSaving(true);
-      if (dialogMode === "create") {
+      if (dialogMode === 'create') {
         await api.post(`/products/add-product/${user.id}`, payload);
       } else {
         if (!activeProductId) {
-          setFormError("No product selected for editing.");
+          setFormError('No product selected for editing.');
           return;
         }
         await api.put(
@@ -162,8 +167,11 @@ export default function ProductDashboard() {
 
       setDialogOpen(false);
       await fetchProducts();
-    } catch (err: any) {
-      setFormError(err?.response?.data?.message ?? "Failed to save product.");
+    } catch (err: unknown) {
+      const message = axios.isAxiosError<ApiErrorResponse>(err)
+        ? err.response?.data?.message
+        : undefined;
+      setFormError(message ?? 'Failed to save product.');
     } finally {
       setSaving(false);
     }
@@ -179,7 +187,7 @@ export default function ProductDashboard() {
       await api.delete(`/products/delete-product/${user.id}/${product.id}`);
       await fetchProducts();
     } catch (error) {
-      console.error("Error deleting product:", error);
+      console.error('Error deleting product:', error);
     }
   };
 
@@ -206,7 +214,7 @@ export default function ProductDashboard() {
               </p>
               {user && (
                 <p className="mt-1 text-sm text-gray-500">
-                  Signed in as{" "}
+                  Signed in as{' '}
                   <span className="font-medium">{user.username}</span>
                 </p>
               )}
@@ -216,7 +224,7 @@ export default function ProductDashboard() {
               <Button
                 variant="contained"
                 onClick={openCreateDialog}
-                sx={{ whiteSpace: "nowrap" }}
+                sx={{ whiteSpace: 'nowrap' }}
               >
                 Add Product
               </Button>
@@ -224,7 +232,7 @@ export default function ProductDashboard() {
               <Button
                 variant="outlined"
                 onClick={() => logout()}
-                sx={{ whiteSpace: "nowrap" }}
+                sx={{ whiteSpace: 'nowrap' }}
               >
                 Logout
               </Button>
@@ -252,7 +260,7 @@ export default function ProductDashboard() {
         <div className="mb-4">
           <p className="text-sm text-gray-600">
             Showing {startIndex + 1}-
-            {Math.min(startIndex + itemsPerPage, filteredProducts.length)} of{" "}
+            {Math.min(startIndex + itemsPerPage, filteredProducts.length)} of{' '}
             {filteredProducts.length} products
           </p>
         </div>
@@ -303,7 +311,7 @@ export default function ProductDashboard() {
 
       <Dialog open={dialogOpen} onClose={closeDialog} fullWidth maxWidth="sm">
         <DialogTitle>
-          {dialogMode === "create" ? "Add Product" : "Edit Product"}
+          {dialogMode === 'create' ? 'Add Product' : 'Edit Product'}
         </DialogTitle>
 
         <DialogContent>
@@ -324,7 +332,7 @@ export default function ProductDashboard() {
             <TextField
               label="Price"
               type="number"
-              inputProps={{ min: 0, step: "0.01" }}
+              inputProps={{ min: 0, step: '0.01' }}
               value={form.price}
               onChange={(e) =>
                 setForm((s) => ({ ...s, price: e.target.value }))
@@ -369,11 +377,11 @@ export default function ProductDashboard() {
               minRows={3}
             />
 
-            <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
+            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
               <TextField
                 label="Rating (0-5)"
                 type="number"
-                inputProps={{ min: 0, max: 5, step: "0.1" }}
+                inputProps={{ min: 0, max: 5, step: '0.1' }}
                 value={form.rate}
                 onChange={(e) =>
                   setForm((s) => ({ ...s, rate: e.target.value }))
@@ -385,7 +393,7 @@ export default function ProductDashboard() {
               <TextField
                 label="Rating count"
                 type="number"
-                inputProps={{ min: 0, step: "1" }}
+                inputProps={{ min: 0, step: '1' }}
                 value={form.rate_count}
                 onChange={(e) =>
                   setForm((s) => ({ ...s, rate_count: e.target.value }))
@@ -403,7 +411,7 @@ export default function ProductDashboard() {
             Cancel
           </Button>
           <Button variant="contained" onClick={submitDialog} disabled={saving}>
-            {dialogMode === "create" ? "Create" : "Save"}
+            {dialogMode === 'create' ? 'Create' : 'Save'}
           </Button>
         </DialogActions>
       </Dialog>

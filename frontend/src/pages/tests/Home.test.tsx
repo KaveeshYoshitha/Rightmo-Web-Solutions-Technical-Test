@@ -1,7 +1,7 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { BrowserRouter } from "react-router-dom";
-import Home from "../Home";
-import { api } from "../../services/api";
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { BrowserRouter } from 'react-router-dom';
+import Home from '../Home';
+import { api } from '../../services/api';
 
 const mockSetProducts = jest.fn();
 const mockSetPage = jest.fn();
@@ -10,19 +10,19 @@ const mockFilterByCategory = jest.fn();
 const mockSortByPrice = jest.fn();
 const mockLogout = jest.fn();
 
-jest.mock("../../services/api", () => ({
+jest.mock('../../services/api', () => ({
   api: {
     get: jest.fn(() =>
       Promise.resolve({
         data: [
           {
             id: 1,
-            title: "Product 1",
+            title: 'Product 1',
             price: 50,
-            category: "electronics",
-            image: "img",
+            category: 'electronics',
+            image: 'img',
             rating: { rate: 4, count: 10 },
-            description: "desc",
+            description: 'desc',
           },
         ],
       }),
@@ -30,11 +30,11 @@ jest.mock("../../services/api", () => ({
   },
 }));
 
-jest.mock("../../store/ProductStore", () => ({
-  useProductStore: (selector?: any) => {
+jest.mock('../../store/ProductStore', () => ({
+  useProductStore: (selector?: unknown) => {
     const state = {
       filteredProducts: [],
-      categories: ["electronics"],
+      categories: ['electronics'],
       currentPage: 1,
       itemsPerPage: 6,
       setProducts: mockSetProducts,
@@ -44,23 +44,27 @@ jest.mock("../../store/ProductStore", () => ({
       sortByPrice: mockSortByPrice,
     };
 
-    return typeof selector === "function" ? selector(state) : state;
+    if (typeof selector === 'function') {
+      return (selector as (s: typeof state) => unknown)(state);
+    }
+
+    return state;
   },
 }));
 
-jest.mock("../../store/AuthStore", () => ({
+jest.mock('../../store/AuthStore', () => ({
   useAuthStore: () => ({
-    user: { id: 1, username: "tester", email: "t@t.com" },
+    user: { id: 1, username: 'tester', email: 't@t.com' },
     logout: mockLogout,
   }),
 }));
 
-describe("Home Page", () => {
+describe('Home Page', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  test("shows loading spinner initially", () => {
+  test('shows loading spinner initially', () => {
     (api.get as unknown as jest.Mock).mockReturnValueOnce(
       new Promise(() => {
         // keep pending
@@ -73,10 +77,10 @@ describe("Home Page", () => {
       </BrowserRouter>,
     );
 
-    expect(screen.getByRole("progressbar")).toBeInTheDocument();
+    expect(screen.getByRole('progressbar')).toBeInTheDocument();
   });
 
-  test("fetches and displays products", async () => {
+  test('fetches and displays products', async () => {
     render(
       <BrowserRouter>
         <Home />
@@ -87,11 +91,11 @@ describe("Home Page", () => {
 
     expect(screen.getByText(/Product Dashboard/i)).toBeInTheDocument();
     expect(
-      screen.getByRole("button", { name: /add product/i }),
+      screen.getByRole('button', { name: /add product/i }),
     ).toBeInTheDocument();
   });
 
-  test("opens add product dialog", async () => {
+  test('opens add product dialog', async () => {
     render(
       <BrowserRouter>
         <Home />
@@ -100,10 +104,10 @@ describe("Home Page", () => {
 
     await waitFor(() => expect(mockSetProducts).toHaveBeenCalled());
 
-    fireEvent.click(screen.getByRole("button", { name: /add product/i }));
+    fireEvent.click(screen.getByRole('button', { name: /add product/i }));
     expect(
-      screen.getByRole("heading", { name: /add product/i }),
+      screen.getByRole('heading', { name: /add product/i }),
     ).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /create/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /create/i })).toBeInTheDocument();
   });
 });

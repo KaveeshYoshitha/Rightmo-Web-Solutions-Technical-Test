@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useState, useEffect, useCallback } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import {
   Container,
   Grid,
@@ -12,10 +12,10 @@ import {
   CircularProgress,
   Divider,
   Stack,
-} from "@mui/material";
-import { ArrowBack as ArrowBackIcon } from "@mui/icons-material";
-import type { Product } from "../types/Product";
-import { api } from "../services/api";
+} from '@mui/material';
+import { ArrowBack as ArrowBackIcon } from '@mui/icons-material';
+import type { Product } from '../types/Product';
+import { api } from '../services/api';
 
 export default function ProductDetail() {
   const { id } = useParams();
@@ -23,11 +23,7 @@ export default function ProductDetail() {
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchProduct();
-  }, [id]);
-
-  const fetchProduct = async () => {
+  const fetchProduct = useCallback(async () => {
     try {
       setLoading(true);
       const response = await api.get(`/products/get-product/${id}`);
@@ -35,11 +31,15 @@ export default function ProductDetail() {
       const resolved = Array.isArray(payload) ? payload[0] : payload;
       setProduct(resolved ?? null);
     } catch (error) {
-      console.error("Error fetching product:", error);
+      console.error('Error fetching product:', error);
     } finally {
       setLoading(false);
     }
-  };
+  }, [id]);
+
+  useEffect(() => {
+    fetchProduct();
+  }, [fetchProduct]);
 
   if (loading) {
     return (
@@ -58,7 +58,7 @@ export default function ProductDetail() {
         <Button
           variant="contained"
           startIcon={<ArrowBackIcon />}
-          onClick={() => navigate("/")}
+          onClick={() => navigate('/')}
         >
           Back to Dashboard
         </Button>
@@ -69,18 +69,18 @@ export default function ProductDetail() {
   const priceValue = Number(product.price);
   const formattedPrice = Number.isFinite(priceValue)
     ? priceValue.toFixed(2)
-    : "0.00";
+    : '0.00';
 
   const ratingValue = Number(product.rating?.rate ?? 0);
   const formattedRating = Number.isFinite(ratingValue)
     ? ratingValue.toFixed(1)
-    : "0.0";
+    : '0.0';
 
   return (
     <div className="min-h-screen bg-gray-50">
       <header className="bg-white shadow-sm">
         <Container maxWidth="lg" className="py-4">
-          <Button startIcon={<ArrowBackIcon />} onClick={() => navigate("/")}>
+          <Button startIcon={<ArrowBackIcon />} onClick={() => navigate('/')}>
             Back to Products
           </Button>
         </Container>
@@ -93,7 +93,7 @@ export default function ProductDetail() {
             <Grid size={{ xs: 6, md: 4 }}>
               <Box
                 className="bg-gray-100 p-8 flex items-center justify-center max-h-3/6"
-                style={{ minHeight: "600px" }}
+                style={{ minHeight: '600px' }}
               >
                 <img
                   src={product.image}
@@ -168,7 +168,7 @@ export default function ProductDetail() {
                       className="text-gray-700 leading-relaxed"
                     >
                       {product.description ||
-                        "No description available for this product."}
+                        'No description available for this product.'}
                     </Typography>
                   </Box>
 
