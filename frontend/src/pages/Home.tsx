@@ -19,6 +19,7 @@ import { api } from '../services/api';
 import { useAuthStore } from '../store/AuthStore';
 import type { Product } from '../types/Product';
 import axios from 'axios';
+import Swal from 'sweetalert2';
 
 type ApiErrorResponse = {
   message?: string;
@@ -180,15 +181,33 @@ export default function ProductDashboard() {
   const deleteProduct = async (product: Product) => {
     if (!user?.id) return;
 
-    const ok = window.confirm(`Delete "${product.title}"?`);
-    if (!ok) return;
+    Swal.fire({
+      title: 'Are you sure that you want to delete this product?',
+      text: 'This action cannot be undone.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, delete it!',
+      cancelButtonText: 'Cancel',
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          await api.delete(`/products/delete-product/${user.id}/${product.id}`);
 
-    try {
-      await api.delete(`/products/delete-product/${user.id}/${product.id}`);
-      await fetchProducts();
-    } catch (error) {
-      console.error('Error deleting product:', error);
-    }
+          Swal.fire({
+            icon: 'success',
+            title: 'Deleted!',
+            text: 'The product has been deleted.',
+          });
+          await fetchProducts();
+        } catch (error: any) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error deleting product',
+            text: error.response?.data?.message || 'An error occurred',
+          });
+        }
+      }
+    });
   };
 
   const startIndex = (currentPage - 1) * itemsPerPage;
