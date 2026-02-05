@@ -96,7 +96,7 @@ DB_PASSWORD=yourpassword
 DB_NAME=product_dashboard
 
 JWT_SECRET=your_jwt_secret
-NODE_ENV=development
+NODE_ENV=production
 ```
 
 Note: the backend currently sets CORS `origin` explicitly. For local development, you may need to allow `http://localhost:5173` (or your Vite dev URL).
