@@ -199,11 +199,15 @@ export default function ProductDashboard() {
             text: 'The product has been deleted.',
           });
           await fetchProducts();
-        } catch (error: any) {
+        } catch (err: unknown) {
+          const message = axios.isAxiosError<ApiErrorResponse>(err)
+            ? err.response?.data?.message
+            : undefined;
+
           Swal.fire({
             icon: 'error',
             title: 'Error deleting product',
-            text: error.response?.data?.message || 'An error occurred',
+            text: message ?? 'An error occurred',
           });
         }
       }
