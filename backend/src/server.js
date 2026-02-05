@@ -1,10 +1,10 @@
-import express from "express";
-import cors from "cors";
-import cookieParser from "cookie-parser";
-import dotenv from "dotenv";
+import express from 'express';
+import cors from 'cors';
+import cookieParser from 'cookie-parser';
+import dotenv from 'dotenv';
 
-import authRoutes from "./routes/authRoutes.js";
-import productsRoutes from "./routes/productsRoutes.js";
+import authRoutes from './routes/authRoutes.js';
+import productsRoutes from './routes/productsRoutes.js';
 
 dotenv.config();
 
@@ -13,7 +13,10 @@ const app = express();
 
 app.use(
   cors({
-    origin: ["https://rightmo-test-frontend.vercel.app"],
+    origin: [
+      'http://localhost:5173',
+      'https://rightmo-test-frontend.vercel.app',
+    ],
     credentials: true,
   }),
 );
@@ -21,8 +24,8 @@ app.use(express.json());
 app.use(cookieParser());
 
 //Routes
-app.use("/api/auth", authRoutes);
-app.use("/api/products", productsRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/products', productsRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
