@@ -172,7 +172,11 @@ export default function ProductDashboard() {
       const message = axios.isAxiosError<ApiErrorResponse>(err)
         ? err.response?.data?.message
         : undefined;
-      setFormError(message ?? 'Failed to save product.');
+      Swal.fire({
+        icon: 'error',
+        title: 'Error deleting product',
+        text: message ?? 'An error occurred',
+      });
     } finally {
       setSaving(false);
     }
