@@ -177,6 +177,8 @@ export default function ProductDashboard() {
         title: 'Error deleting product',
         text: message ?? 'An error occurred',
       });
+
+      setDialogOpen(false);
     } finally {
       setSaving(false);
     }
